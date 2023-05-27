@@ -1,10 +1,15 @@
-import './styles/main.css'
+import { UserProvider } from "./providers/UserContext";
+import { RoutesMain } from "./routes";
+import "./styles/main.sass";
+import "./styles/tailwind.css";
 
 function App() {
-
   return (
-    <div></div>
+  <UserProvider>
+    <RoutesMain />;
+  </UserProvider>
   )
+
 }
 
-export default App
+export default App;
