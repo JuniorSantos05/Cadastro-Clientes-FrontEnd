@@ -2,8 +2,8 @@ import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { TRegisterData, registerFormSchema } from "./RegisterFormSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UserContext } from "../providers/UserContext";
 import { useContext, useState } from "react"
+import { UserContext } from "../../providers/UserContext";
 
 
 export const RegisterForm = () => {
