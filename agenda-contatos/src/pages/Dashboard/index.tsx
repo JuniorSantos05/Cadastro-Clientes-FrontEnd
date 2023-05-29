@@ -1,6 +1,15 @@
+import { useContext } from 'react';
+import { ContactList } from "../../components/ContactsList/ContactsList"
+import { ContactContext } from "../../providers/ContactsContext";
+import { Header } from "../../components/Header/Header";
+
 export const Dashboard = () => {
+    const { setShowModalCreate} = useContext(ContactContext);
 
     return (
-        <h1>Dash</h1>
+        <div>
+            <Header openModalCreate={() => setShowModalCreate(true)}/>
+            <ContactList/>                
+        </div>
     )
 }
