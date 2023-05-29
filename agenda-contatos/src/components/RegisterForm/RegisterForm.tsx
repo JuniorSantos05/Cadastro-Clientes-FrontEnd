@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useContext, useState } from "react"
 import { UserContext } from "../../providers/UserContext";
 
-
 export const RegisterForm = () => {
 
   const { userRegister } = useContext(UserContext);

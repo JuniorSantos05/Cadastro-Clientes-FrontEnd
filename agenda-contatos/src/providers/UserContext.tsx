@@ -3,8 +3,6 @@ import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import { TRegisterData } from "../components/RegisterForm/RegisterFormSchema";
 import { TLoginData } from "../components/LoginForm/LoginFormSchema";
-import { AxiosError } from "axios";
-import Toastify from "../components/Toastify/Toastify";
 
 
 interface IUserProviderProps {
@@ -14,6 +12,7 @@ interface IUserProviderProps {
 interface IUserContext {
   userRegister: (userData: TRegisterData, setLoading: React.Dispatch<React.SetStateAction<boolean>>) => Promise<void>
   login: (loginData: TLoginData, setLoading: React.Dispatch<React.SetStateAction<boolean>>) => Promise<void>
+  userLogout: () => void
 }
 
 interface IUser {
@@ -27,8 +26,8 @@ interface IUser {
 
 
 interface ILoginResponse {
-  token: string;
   user: IUser
+  token: string;
 }
 
 export const UserContext = createContext({} as IUserContext);
@@ -40,10 +39,9 @@ export const UserProvider = ({ children }: IUserProviderProps) => {
     try {
       setLoading(true);
       await api.post<IUser>("/users", userData);
-      Toastify.sucess("Conta registrada! 😎");
+      console.log("Conta registrada! 😎");
     } catch (error) {
-      const requestError = error as AxiosError;
-      Toastify.error(requestError.response?.data);
+      console.log(error)
     } finally {
       setLoading(false);
       navigate("/")
@@ -53,23 +51,24 @@ export const UserProvider = ({ children }: IUserProviderProps) => {
   const login =async (loginData:TLoginData, setLoading: React.Dispatch<React.SetStateAction<boolean>>): Promise<void> => {
     try {
       setLoading(true);
-      const response = await api.post<ILoginResponse>("/login", loginData);
-      const { user: userResponse, token } = response.data
-      localStorage.setItem("@TOKEN", token);
-      localStorage.setItem("@USERID", JSON.stringify(userResponse.id));
-      Toastify.sucess("Login realizado com sucesso! 😎");
-    } catch (error) {
-      const requestError = error as AxiosError;
-      Toastify.error(requestError.response?.data);
-    } finally {
+      const { data } = await api.post<ILoginResponse>("/login", loginData);
+      localStorage.setItem("@TOKEN", data.token);
+      //localStorage.setItem("@USERID", JSON.stringify(data.user.id)); 
       setLoading(false);
-      navigate("/dashboard")
-    }
+      navigate("/dashboard", { replace: true })
+    } catch (error) {
+      console.log(error)
+    } 
+  };
+
+  const userLogout = () => {
+    localStorage.removeItem("@TOKEN");
+    navigate("/");
   };
   
 
   return (
-    <UserContext.Provider value={{ userRegister, login }}>
+    <UserContext.Provider value={{ userRegister, login, userLogout }}>
       {children}
     </UserContext.Provider>
   );
