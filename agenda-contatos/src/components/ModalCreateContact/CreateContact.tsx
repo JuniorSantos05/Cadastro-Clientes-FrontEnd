@@ -51,13 +51,13 @@ export const CreateContact = ({ open, onClose }: ContactModalProps) => {
       <section className="container"  onClick={(event) => event.stopPropagation()}>
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-3xl">
-            Cadastro de Contato
+            Adicionar Contato
           </h2>
         </div>
         <form
           action="#"
           method="POST"
-          className="mx-auto mt-16 max-w-xl sm:mt-20"
+          className="mx-auto mt-16 max-w-xl sm:mt-16"
           onSubmit={handleSubmit(submit)}
         >
           <div className="sm:col-span-2">
