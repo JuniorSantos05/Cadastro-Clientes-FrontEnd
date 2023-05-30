@@ -2,10 +2,14 @@ import { useContext } from "react"
 import { ContactContext } from "../../providers/ContactsContext"
 import { FaTrash, FaEdit } from 'react-icons/fa';
 
-
 export const ContactListContent = () => {
 
-  const {contacts, removeContact} = useContext(ContactContext)
+  const {contacts, removeContact, setSelectedContactId, setShowEditModal} = useContext(ContactContext)
+
+  const openEditModal = (contactId: number) => {
+    setSelectedContactId(contactId);
+    setShowEditModal(true);
+  };
 
     return (
         <ul role="list" className="divide-y divide-gray-100">
@@ -21,7 +25,7 @@ export const ContactListContent = () => {
                
                   <div className="mt-1 flex items-center gap-x-4">
                     <p className="text-xs leading-5 text-gray-500">{contact.email}</p>
-                    <FaEdit className="hover:text-blue-500 cursor-pointer"/>
+                    <FaEdit onClick={() => openEditModal(contact.id)} className="hover:text-blue-500 cursor-pointer"/>
                     <FaTrash onClick={() => removeContact(contact.id)} className="hover:text-red-500 cursor-pointer"/>
                   </div>
                
