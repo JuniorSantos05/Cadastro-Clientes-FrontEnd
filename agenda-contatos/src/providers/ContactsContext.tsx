@@ -11,6 +11,7 @@ interface IContactContext {
     showModalCreate: boolean
     setShowModalCreate: React.Dispatch<React.SetStateAction<boolean>>
     createContact: (contactData: TContactData, setLoading: React.Dispatch<React.SetStateAction<boolean>>) => Promise<void>
+    removeContact: (contactId: number) => Promise<void>
    }
 
 interface IContact {
@@ -43,7 +44,9 @@ export const ContactProvider = ({ children }: IContactProviderProps) => {
         getContacts();        
       }, []);
 
-      const createContact = async (contactData: TContactData, setLoading: React.Dispatch<React.SetStateAction<boolean>>): Promise<void> => {
+      const createContact = async (contactData: TContactData, setLoading: React.Dispatch<React.SetStateAction<boolean>>): 
+      Promise<void> => {
+
         try {
           setLoading(true);
           const token = localStorage.getItem("@TOKEN")
@@ -60,11 +63,30 @@ export const ContactProvider = ({ children }: IContactProviderProps) => {
           setShowModalCreate(false)
         }
       };
+
+      const removeContact = async (contactId: number) => {
+        const token = localStorage.getItem("@TOKEN");
+
+        try {
+            await api.delete(`/contacts/${contactId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            })
+
+            const newContactsList = contacts.filter(contact => contact.id !== contactId);
+            setContacts(newContactsList);
+            console.log('Contato removido com sucesso!')
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
     
 
 
     return (
-        <ContactContext.Provider value={{ contacts, showModalCreate, setShowModalCreate, createContact }}>
+        <ContactContext.Provider value={{ contacts, showModalCreate, setShowModalCreate, createContact, removeContact }}>
           {children}
         </ContactContext.Provider>
       );

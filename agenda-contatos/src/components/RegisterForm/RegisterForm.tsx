@@ -4,6 +4,7 @@ import { TRegisterData, registerFormSchema } from "./RegisterFormSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useContext, useState } from "react"
 import { UserContext } from "../../providers/UserContext";
+import { Link } from "react-router-dom";
 
 export const RegisterForm = () => {
 
@@ -19,7 +20,7 @@ export const RegisterForm = () => {
  };
 
   return (
-    <div className="isolate bg-white px-6 py-24 sm:py-32 lg:px-8">
+    <div className="isolate bg-white px-6" style={{ paddingTop: '2rem', paddingBottom: '12px' }}>
       <div
         className="absolute inset-x-0 top-[-10rem] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[-20rem]"
         aria-hidden="true"
@@ -152,6 +153,16 @@ export const RegisterForm = () => {
           </button>
         </div>
       </form>
+      <p className="mt-10 text-center text-sm text-gray-500">
+          Já é cadastrado?{" "}
+          <Link
+            to="/"
+            className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
+          >
+            Faça seu login aqui
+          </Link>
+        </p>
+
     </div>
   );
 };
