@@ -2,6 +2,7 @@ import { createContext, useEffect, useState } from "react";
 import { api } from "../services/api";
 import { TContactData } from "../components/ModalCreateContact/CreateContactSchema";
 import { TContactUpdateData } from "../components/ModalEditContact/EditContactSchema";
+import { useNavigate } from "react-router-dom";
 
 interface IContactProviderProps {
   children: React.ReactNode;
@@ -19,6 +20,7 @@ interface IContactContext {
   setSelectedContactId: React.Dispatch<React.SetStateAction<number | null>>
   showEditModal: boolean
   setShowEditModal: React.Dispatch<React.SetStateAction<boolean>>
+  loading: boolean
 }
 
 export interface IContact {
@@ -33,7 +35,6 @@ export interface ContactId {
   id: number;
 }
 
-
 export type PartialContact = Partial<IContact>;
 
 export const ContactContext = createContext({} as IContactContext);
@@ -43,8 +44,9 @@ export const ContactProvider = ({ children }: IContactProviderProps) => {
   const [showModalCreate, setShowModalCreate] = useState(false);
   const [selectedContactId, setSelectedContactId] = useState<number | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-
+  const navigate = useNavigate()
 
   const getContacts = async (): Promise<void> => {
     try {
@@ -53,14 +55,23 @@ export const ContactProvider = ({ children }: IContactProviderProps) => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setContacts(response.data);
+      setLoading(false)
     } catch (error) {
       console.log(error);
+      setLoading(false)
     }
   };
 
   useEffect(() => {
-    getContacts();
-  }, []);
+    const token = localStorage.getItem("@TOKEN");
+
+    if(token) {
+      getContacts();
+    } else {
+      navigate("/")
+    }
+
+  });
 
   const createContact = async ( contactData: TContactData): Promise<void> => {
     const token = localStorage.getItem("@TOKEN");
@@ -125,7 +136,8 @@ export const ContactProvider = ({ children }: IContactProviderProps) => {
         selectedContactId,
         setSelectedContactId,
         showEditModal, 
-        setShowEditModal
+        setShowEditModal,
+        loading
       }}
     >
       {children}
