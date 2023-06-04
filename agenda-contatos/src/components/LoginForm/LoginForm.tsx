@@ -1,4 +1,4 @@
-import "./LoginForm.sass"
+import "./LoginForm.sass";
 import { Link } from "react-router-dom";
 import { UserContext } from "../../providers/UserContext";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -6,6 +6,7 @@ import { TLoginData, loginFormSchema } from "./LoginFormSchema";
 import { useContext, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { Tooltip } from "react-tooltip";
 
 export const LoginForm = () => {
   const { login, loading } = useContext(UserContext);
@@ -62,8 +63,12 @@ export const LoginForm = () => {
                 autoComplete="email"
                 {...register("email")}
                 disabled={loading}
+                data-tooltip-id="email-tooltip"
+                data-tooltip-content={errors.email ? errors.email.message : ""}
+                data-tooltip-place="top"
+                data-tooltip-float={true}
               />
-              {errors.email && (<span id="erro_msg">{errors.email.message}</span>)}
+              <Tooltip id="email-tooltip" />
             </div>
           </div>
 
@@ -92,13 +97,29 @@ export const LoginForm = () => {
                 autoComplete="current-password"
                 {...register("password")}
                 disabled={loading}
+                data-tooltip-id="password-tooltip"
+                data-tooltip-content={
+                  errors.password ? errors.password.message : ""
+                }
+                data-tooltip-place="top"
+                data-tooltip-float={true}
               />
-              {showPassword === "password" ? (<FaEye className="eyeIcon text-gray-500" onClick={() => { setShowPassword("text") }}
+              <Tooltip id="password-tooltip" />
+              {showPassword === "password" ? (
+                <FaEye
+                  className="eyeIconLogin text-gray-500"
+                  onClick={() => {
+                    setShowPassword("text");
+                  }}
                 />
-              ) : (<FaEyeSlash className="eyeIcon text-gray-500" onClick={() => { setShowPassword("password") }}
+              ) : (
+                <FaEyeSlash
+                  className="eyeIconLogin text-gray-500"
+                  onClick={() => {
+                    setShowPassword("password");
+                  }}
                 />
               )}{" "}
-              {errors.password && (<span id="erro_msg">{errors.password.message}</span>)}
             </div>
           </div>
 
