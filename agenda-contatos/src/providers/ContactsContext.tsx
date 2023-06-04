@@ -2,7 +2,7 @@ import { createContext, useEffect, useState } from "react";
 import { api } from "../services/api";
 import { TContactData } from "../components/ModalCreateContact/CreateContactSchema";
 import { TContactUpdateData } from "../components/ModalEditContact/EditContactSchema";
-import { useNavigate } from "react-router-dom";
+import { Toastify } from "../components/Toastify/Toastify";
 
 interface IContactProviderProps {
   children: React.ReactNode;
@@ -15,7 +15,6 @@ interface IContactContext {
   createContact: (contactData: TContactData) => Promise<void>
   removeContact: (contactId: number) => Promise<void>;
   updateContact: (contactData: TContactUpdateData, contactId: number) => Promise<void>
-  getContacts: () => Promise<void>
   selectedContactId: number | null
   setSelectedContactId: React.Dispatch<React.SetStateAction<number | null>>
   showEditModal: boolean
@@ -40,49 +39,42 @@ export type PartialContact = Partial<IContact>;
 export const ContactContext = createContext({} as IContactContext);
 
 export const ContactProvider = ({ children }: IContactProviderProps) => {
-  const [contacts, setContacts] = useState([] as IContact[]);
+  const [contacts, setContacts] = useState<IContact[]>([]);
   const [showModalCreate, setShowModalCreate] = useState(false);
   const [selectedContactId, setSelectedContactId] = useState<number | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const navigate = useNavigate()
-
-  const getContacts = async (): Promise<void> => {
-    try {
-      const token = localStorage.getItem("@TOKEN");
-      const response = await api.get("/contacts", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setContacts(response.data);
-      setLoading(false)
-    } catch (error) {
-      console.log(error);
-      setLoading(false)
-    }
-  };
 
   useEffect(() => {
-    const token = localStorage.getItem("@TOKEN");
-
-    if(token) {
-      getContacts();
-    } else {
-      navigate("/")
+    const getContacts = async (): Promise<void> => {
+      try {
+        const token = localStorage.getItem("@TOKEN");
+        const response = await api.get("/contacts", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setContacts(response.data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
     }
-
-  });
+      getContacts()
+    }, []);
 
   const createContact = async ( contactData: TContactData): Promise<void> => {
     const token = localStorage.getItem("@TOKEN");
     try {
-      await api.post<IContact>("/contacts", contactData, {
+      const response = await api.post<IContact>("/contacts", contactData, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("Contato Criado! 😎");
-      getContacts();
+      const newContact: IContact = response.data;
+      Toastify.success("Contato Criado com sucesso! 😎")
+      setContacts([...contacts, newContact])
     } catch (error) {
       console.log(error);
+      Toastify.error(error)
     } finally {
       setShowModalCreate(false);
     }
@@ -101,23 +93,26 @@ export const ContactProvider = ({ children }: IContactProviderProps) => {
         (contact) => contact.id !== contactId
       );
       setContacts(newContactsList);
-      console.log("Contato removido com sucesso!");
+      Toastify.success("Contato removido com sucesso!")
     } catch (error) {
       console.log(error);
+      Toastify.error(error)
     }
   };
 
   const updateContact = async (contactData: TContactUpdateData, contactId: number) => {
     const token = localStorage.getItem("@TOKEN");
     try {
-      await api.patch(`/contacts/${contactId}`, contactData, {
+      const response = await api.patch(`/contacts/${contactId}`, contactData, {
         headers: {
           Authorization: `Bearer ${token}`},
       });
-      console.log("Contato Atualizado! 😎");
-      getContacts();
+      const updateContact: IContact = response.data;
+      Toastify.success("Contato Atualizado! 😎")
+      setContacts([...contacts, updateContact])
     } catch (error) {
       console.log(error);
+      Toastify.error(error)
     } finally {
       setShowEditModal(false);
     }
@@ -132,7 +127,6 @@ export const ContactProvider = ({ children }: IContactProviderProps) => {
         createContact,
         removeContact,
         updateContact,
-        getContacts,
         selectedContactId,
         setSelectedContactId,
         showEditModal, 
