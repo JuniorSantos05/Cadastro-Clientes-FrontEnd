@@ -13,7 +13,6 @@ export const editContactSchema = z.object({
     .string()
     .max(14, 'O telefone deve ter no máximo 14 caracteres')
     .optional()
-});
-
+})
 export type TContactUpdateData = z.infer<typeof editContactSchema>;
 

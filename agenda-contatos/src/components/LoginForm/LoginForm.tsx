@@ -1,23 +1,25 @@
+import "./LoginForm.sass";
 import { Link } from "react-router-dom";
 import { UserContext } from "../../providers/UserContext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TLoginData, loginFormSchema } from "./LoginFormSchema";
 import { useContext, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { Tooltip } from "react-tooltip";
 
 export const LoginForm = () => {
-
-  const { login } = useContext(UserContext);
-  const [loading, setLoading] = useState(false);
+  const { login, loading } = useContext(UserContext);
+  const [showPassword, setShowPassword] = useState("password");
 
   const { register, handleSubmit, formState: { errors } } = useForm<TLoginData>({
     resolver: zodResolver(loginFormSchema),
-  });  
+  });
 
-  const submit: SubmitHandler<TLoginData> = (loginData) => {
-    login(loginData, setLoading);
- };
- 
+  const submit: SubmitHandler<TLoginData> = async (loginData) => {
+    login(loginData);
+  };
+
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
       <div
@@ -40,7 +42,12 @@ export const LoginForm = () => {
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form className="space-y-6" action="#" method="POST" onSubmit={handleSubmit(submit)}>
+        <form
+          className="space-y-6"
+          action="#"
+          method="POST"
+          onSubmit={handleSubmit(submit)}
+        >
           <div>
             <label
               htmlFor="email"
@@ -55,9 +62,13 @@ export const LoginForm = () => {
                 type="email"
                 autoComplete="email"
                 {...register("email")}
-                disabled={loading}             
-                 />
-              {errors.email && <span id="erro_msg">{errors.email.message}</span>}
+                disabled={loading}
+                data-tooltip-id="email-tooltip"
+                data-tooltip-content={errors.email ? errors.email.message : ""}
+                data-tooltip-place="top"
+                data-tooltip-float={true}
+              />
+              <Tooltip id="email-tooltip" />
             </div>
           </div>
 
@@ -78,16 +89,37 @@ export const LoginForm = () => {
                 </a>
               </div>
             </div>
-            <div className="mt-2">
+            <div className="mt-2 relative">
               <input
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 pr-10"
                 id="password"
-                type="password"
+                type={showPassword}
                 autoComplete="current-password"
                 {...register("password")}
-                disabled={loading}             
+                disabled={loading}
+                data-tooltip-id="password-tooltip"
+                data-tooltip-content={
+                  errors.password ? errors.password.message : ""
+                }
+                data-tooltip-place="top"
+                data-tooltip-float={true}
               />
-              {errors.password && <span id="erro_msg">{errors.password.message}</span>}
+              <Tooltip id="password-tooltip" />
+              {showPassword === "password" ? (
+                <FaEye
+                  className="eyeIconLogin text-gray-500"
+                  onClick={() => {
+                    setShowPassword("text");
+                  }}
+                />
+              ) : (
+                <FaEyeSlash
+                  className="eyeIconLogin text-gray-500"
+                  onClick={() => {
+                    setShowPassword("password");
+                  }}
+                />
+              )}{" "}
             </div>
           </div>
 
@@ -97,7 +129,7 @@ export const LoginForm = () => {
               disabled={loading}
               className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
-            {loading ? "Conectando..." : "Entrar"}
+              {loading ? "Conectando..." : "Entrar"}
             </button>
           </div>
         </form>
