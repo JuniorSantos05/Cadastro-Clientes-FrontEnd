@@ -1,15 +1,24 @@
 import { useContext } from "react"
 import { ContactContext } from "../../providers/ContactsContext"
 import { FaTrash, FaEdit } from 'react-icons/fa';
+import { Loading } from "../Loading/Loading";
 
 export const ContactListContent = () => {
 
-  const {contacts, removeContact, setSelectedContactId, setShowEditModal} = useContext(ContactContext)
+  const {contacts, removeContact, setSelectedContactId, setShowEditModal, loading} = useContext(ContactContext)
 
   const openEditModal = (contactId: number) => {
     setSelectedContactId(contactId);
     setShowEditModal(true);
   };
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (!contacts || contacts.length === 0) {
+    return <p>Não há contatos disponíveis.</p>;
+  }
 
     return (
         <ul role="list" className="divide-y divide-gray-100">
